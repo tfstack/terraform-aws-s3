@@ -11,6 +11,8 @@ resource "random_string" "suffix" {
 module "s3_bucket" {
   source = "../.."
 
+  region = "ap-southeast-2"
+
   # General Configuration
   bucket_name   = "test-bucket"
   bucket_suffix = random_string.suffix.result
