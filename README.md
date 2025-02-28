@@ -54,6 +54,7 @@ No modules.
 | <a name="input_logging_log_retention_days"></a> [logging\_log\_retention\_days](#input\_logging\_log\_retention\_days) | Number of days to retain S3 logging data before expiration. | `number` | `30` | no |
 | <a name="input_logging_s3_prefix"></a> [logging\_s3\_prefix](#input\_logging\_s3\_prefix) | Prefix for S3 logging objects. | `string` | `"s3/"` | no |
 | <a name="input_object_ownership"></a> [object\_ownership](#input\_object\_ownership) | Defines who owns newly uploaded objects in the bucket. | `string` | `"BucketOwnerPreferred"` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region for the provider. Defaults to ap-southeast-2 if not specified. | `string` | `"ap-southeast-2"` | no |
 | <a name="input_restrict_public_buckets"></a> [restrict\_public\_buckets](#input\_restrict\_public\_buckets) | Whether to restrict public access to the bucket. | `bool` | `true` | no |
 | <a name="input_sse_algorithm"></a> [sse\_algorithm](#input\_sse\_algorithm) | The encryption algorithm for S3 bucket | `string` | `"AES256"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags for the S3 bucket | `map(string)` | `{}` | no |

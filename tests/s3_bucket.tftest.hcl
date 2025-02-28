@@ -6,6 +6,8 @@ run "setup" {
 
 run "test_s3_bucket" {
   variables {
+    region = run.setup.region
+
     bucket_name   = "test-s3-bucket"
     bucket_suffix = run.setup.suffix
     force_destroy = true
