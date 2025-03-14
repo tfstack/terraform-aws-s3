@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.84.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-southeast-2"
+}
+
 # Fetch AWS Account ID dynamically
 data "aws_caller_identity" "current" {}
 
@@ -9,8 +22,6 @@ resource "random_string" "suffix" {
 
 module "s3_bucket" {
   source = "../.."
-
-  region = "ap-southeast-2"
 
   # General Configuration
   bucket_name   = "test-bucket"

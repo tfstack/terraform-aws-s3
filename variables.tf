@@ -1,19 +1,4 @@
 ############################################
-# GENERAL CONFIGURATION
-############################################
-
-variable "region" {
-  description = "AWS region for the provider. Defaults to ap-southeast-2 if not specified."
-  type        = string
-  default     = "ap-southeast-2"
-
-  validation {
-    condition     = can(regex("^([a-z]{2}-[a-z]+-\\d{1})$", var.region))
-    error_message = "Invalid AWS region format. Example: 'us-east-1', 'ap-southeast-2'."
-  }
-}
-
-############################################
 # GENERAL BUCKET CONFIGURATION VARIABLES
 ############################################
 
