@@ -6,8 +6,6 @@ run "setup" {
 
 run "test_s3_bucket" {
   variables {
-    region = run.setup.region
-
     bucket_name   = "test-s3-bucket"
     bucket_suffix = run.setup.suffix
     force_destroy = true
@@ -34,11 +32,12 @@ run "test_s3_bucket" {
     enable_versioning = true
 
     # Logging Configuration
-    logging_enabled              = true
-    logging_encryption_enabled   = true
-    logging_encryption_algorithm = "AES256"
-    logging_log_retention_days   = 90
-    logging_s3_prefix            = "logs/"
+    logging_enabled                 = true
+    logging_encryption_enabled      = true
+    logging_encryption_algorithm    = "AES256"
+    logging_log_retention_days      = 90
+    logging_s3_prefix               = "logs/"
+    logging_lifecycle_filter_prefix = "logs/"
   }
 
   # Assertions referencing actual Terraform resources
@@ -96,5 +95,10 @@ run "test_s3_bucket" {
   assert {
     condition     = aws_s3_bucket_logging.logging[0].target_prefix == "logs/"
     error_message = "Logging S3 prefix is not set to 'logs/'."
+  }
+
+  assert {
+    condition     = aws_s3_bucket_lifecycle_configuration.logging[0].rule[0].filter[0].prefix == "logs/"
+    error_message = "Lifecycle rule prefix is not set to the expected value 'logs/'."
   }
 }

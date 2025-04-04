@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.84.0"
+      version = "5.94.0"
     }
   }
 }
@@ -48,11 +48,12 @@ module "s3_bucket" {
   enable_versioning = true
 
   # Logging Configuration
-  logging_enabled              = true
-  logging_encryption_enabled   = true
-  logging_encryption_algorithm = "AES256"
-  logging_log_retention_days   = 90
-  logging_s3_prefix            = "logs/"
+  logging_enabled                 = true
+  logging_encryption_enabled      = true
+  logging_encryption_algorithm    = "AES256"
+  logging_lifecycle_filter_prefix = "access-logs/"
+  logging_log_retention_days      = 90
+  logging_s3_prefix               = "logs/"
 }
 
 # Outputs

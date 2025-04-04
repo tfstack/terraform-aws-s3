@@ -1,8 +1,8 @@
 locals {
   base_bucket_name = (
-    var.bucket_suffix == "" ? 
-    var.bucket_name : 
-    "${var.bucket_name}-${var.bucket_suffix}")
+    var.bucket_suffix == "" ?
+    var.bucket_name :
+  "${var.bucket_name}-${var.bucket_suffix}")
 }
 
 ############################################
@@ -126,6 +126,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "logging" {
   rule {
     id     = "log-retention"
     status = "Enabled"
+
+    filter {
+      prefix = var.logging_lifecycle_filter_prefix
+    }
 
     expiration {
       days = var.logging_log_retention_days

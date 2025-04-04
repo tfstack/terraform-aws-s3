@@ -129,6 +129,17 @@ variable "logging_encryption_algorithm" {
   }
 }
 
+variable "logging_lifecycle_filter_prefix" {
+  description = "Prefix to apply S3 lifecycle rule to. Set to \"\" to apply to all objects."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9!_.*'()/~\\-]*$", var.logging_lifecycle_filter_prefix))
+    error_message = "The lifecycle prefix must be a valid S3 object key prefix or an empty string."
+  }
+}
+
 variable "logging_log_retention_days" {
   description = "Number of days to retain S3 logging data before expiration."
   type        = number
