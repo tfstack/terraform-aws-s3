@@ -168,7 +168,7 @@ No modules.
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable versioning for the bucket | `bool` | `true` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether to allow deletion of non-empty bucket | `bool` | `false` | no |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Whether to ignore public ACLs for this bucket. | `bool` | `true` | no |
-| <a name="input_lifecycle_rules"></a> [lifecycle\_rules](#input\_lifecycle\_rules) | List of lifecycle rules for the S3 bucket. Each rule is a map that will be passed directly to the aws_s3_bucket_lifecycle_configuration resource. | `any` | `[]` | no |
+| <a name="input_lifecycle_rules"></a> [lifecycle\_rules](#input\_lifecycle\_rules) | List of lifecycle rules for the S3 bucket. Each rule is a map that will be passed directly to the aws\_s3\_bucket\_lifecycle\_configuration resource. | `any` | `[]` | no |
 | <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Enable logging for the S3 bucket | `bool` | `false` | no |
 | <a name="input_logging_encryption_algorithm"></a> [logging\_encryption\_algorithm](#input\_logging\_encryption\_algorithm) | The encryption algorithm used for S3 logging. Valid values: 'AES256', 'aws:kms'. | `string` | `"AES256"` | no |
 | <a name="input_logging_encryption_enabled"></a> [logging\_encryption\_enabled](#input\_logging\_encryption\_enabled) | Enable encryption for S3 logging. | `bool` | `true` | no |
