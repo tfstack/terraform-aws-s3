@@ -166,42 +166,33 @@ variable "logging_s3_prefix" {
 # LIFECYCLE CONFIGURATION
 ############################################
 
-variable "lifecycle_enabled" {
-  description = "Enable lifecycle configuration for the S3 bucket"
-  type        = bool
-  default     = false
-}
-
-variable "lifecycle_rule_id" {
-  description = "ID for the lifecycle rule. Must be unique within the bucket."
-  type        = string
-  default     = "cleanup-incomplete-uploads"
+variable "lifecycle_rules" {
+  description = "List of lifecycle rules for the S3 bucket. Each rule is a map that will be passed directly to the aws_s3_bucket_lifecycle_configuration resource."
+  type        = any
+  default     = []
 
   validation {
-    condition     = length(var.lifecycle_rule_id) > 0 && length(var.lifecycle_rule_id) <= 255
-    error_message = "Lifecycle rule ID must be between 1 and 255 characters."
+    condition = alltrue([
+      for rule in var.lifecycle_rules :
+      contains(keys(rule), "id") && contains(keys(rule), "status")
+    ])
+    error_message = "Each lifecycle rule must have 'id' and 'status' keys."
   }
-}
-
-variable "lifecycle_rule_status" {
-  description = "Status of the lifecycle rule. Set to 'Disabled' to temporarily disable the rule without deleting it."
-  type        = string
-  default     = "Disabled"
 
   validation {
-    condition     = contains(["Enabled", "Disabled"], var.lifecycle_rule_status)
-    error_message = "Lifecycle rule status must be 'Enabled' or 'Disabled'."
+    condition = alltrue([
+      for rule in var.lifecycle_rules :
+      length(rule.id) > 0 && length(rule.id) <= 255
+    ])
+    error_message = "Each lifecycle rule ID must be between 1 and 255 characters."
   }
-}
-
-variable "lifecycle_abort_incomplete_multipart_upload_days" {
-  description = "Number of days after which incomplete multipart uploads are aborted. This helps reduce storage costs by cleaning up failed uploads."
-  type        = number
-  default     = 1
 
   validation {
-    condition     = var.lifecycle_abort_incomplete_multipart_upload_days > 0
-    error_message = "The abort incomplete multipart upload days must be greater than 0."
+    condition = alltrue([
+      for rule in var.lifecycle_rules :
+      contains(["Enabled", "Disabled"], rule.status)
+    ])
+    error_message = "Each lifecycle rule status must be 'Enabled' or 'Disabled'."
   }
 }
 

@@ -1,6 +1,126 @@
 # terraform-aws-s3
 
-Terraform module to create an S3 bucket
+Terraform module to create an S3 bucket with flexible lifecycle configuration.
+
+## Features
+
+- ✅ **Dynamic Lifecycle Rules** - Flexible configuration supporting any S3 lifecycle pattern
+- ✅ **Multiple Rule Types** - Expiration, transitions, cleanup, version management
+- ✅ **Flexible Filtering** - Prefix and tag-based filtering
+- ✅ **Cost Optimization** - Storage class transitions for cost savings
+- ✅ **Version Management** - Noncurrent version expiration support
+- ✅ **Security** - Public access blocking and encryption
+- ✅ **Logging** - Optional S3 access logging
+
+## Lifecycle Rules Examples
+
+The module supports dynamic lifecycle rules through the `lifecycle_rules` variable. Here are some common patterns:
+
+### Basic Examples
+
+**Simple Expiration:**
+
+```hcl
+lifecycle_rules = [
+  {
+    id     = "expire-after-30-days"
+    status = "Enabled"
+    expiration = {
+      days = 30
+    }
+  }
+]
+```
+
+**Cleanup Incomplete Uploads:**
+
+```hcl
+lifecycle_rules = [
+  {
+    id     = "cleanup-incomplete-uploads"
+    status = "Enabled"
+    abort_incomplete_multipart_upload = {
+      days_after_initiation = 7
+    }
+  }
+]
+```
+
+**Log Retention with Prefix Filter:**
+
+```hcl
+lifecycle_rules = [
+  {
+    id     = "log-retention"
+    status = "Enabled"
+    filter = {
+      prefix = "logs/"
+    }
+    expiration = {
+      days = 90
+    }
+    noncurrent_version_expiration = {
+      noncurrent_days = 30
+    }
+  }
+]
+```
+
+**Storage Class Transitions:**
+
+```hcl
+lifecycle_rules = [
+  {
+    id     = "cost-optimization"
+    status = "Enabled"
+    filter = {
+      prefix = "data/"
+    }
+    transitions = [
+      {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      },
+      {
+        days          = 90
+        storage_class = "GLACIER"
+      },
+      {
+        days          = 365
+        storage_class = "DEEP_ARCHIVE"
+      }
+    ]
+  }
+]
+```
+
+**Tag-based Filtering:**
+
+```hcl
+lifecycle_rules = [
+  {
+    id     = "production-data-retention"
+    status = "Enabled"
+    filter = {
+      tag = {
+        key   = "Environment"
+        value = "production"
+      }
+    }
+    expiration = {
+      days = 2555  # 7 years
+    }
+  }
+]
+```
+
+### Supported Rule Types
+
+- `expiration` - Delete objects after specified days/date
+- `noncurrent_version_expiration` - Delete noncurrent versions
+- `abort_incomplete_multipart_upload` - Clean up failed uploads
+- `transitions` - Move objects to different storage classes
+- `filter` - Apply rules to specific objects (prefix/tag)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -48,10 +168,7 @@ No modules.
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable versioning for the bucket | `bool` | `true` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether to allow deletion of non-empty bucket | `bool` | `false` | no |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Whether to ignore public ACLs for this bucket. | `bool` | `true` | no |
-| <a name="input_lifecycle_abort_incomplete_multipart_upload_days"></a> [lifecycle\_abort\_incomplete\_multipart\_upload\_days](#input\_lifecycle\_abort\_incomplete\_multipart\_upload\_days) | Number of days after which incomplete multipart uploads are aborted. This helps reduce storage costs by cleaning up failed uploads. | `number` | `1` | no |
-| <a name="input_lifecycle_enabled"></a> [lifecycle\_enabled](#input\_lifecycle\_enabled) | Enable lifecycle configuration for the S3 bucket | `bool` | `false` | no |
-| <a name="input_lifecycle_rule_id"></a> [lifecycle\_rule\_id](#input\_lifecycle\_rule\_id) | ID for the lifecycle rule. Must be unique within the bucket. | `string` | `"cleanup-incomplete-uploads"` | no |
-| <a name="input_lifecycle_rule_status"></a> [lifecycle\_rule\_status](#input\_lifecycle\_rule\_status) | Status of the lifecycle rule. Set to 'Disabled' to temporarily disable the rule without deleting it. | `string` | `"Disabled"` | no |
+| <a name="input_lifecycle_rules"></a> [lifecycle\_rules](#input\_lifecycle\_rules) | List of lifecycle rules for the S3 bucket. Each rule is a map that will be passed directly to the aws_s3_bucket_lifecycle_configuration resource. | `any` | `[]` | no |
 | <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Enable logging for the S3 bucket | `bool` | `false` | no |
 | <a name="input_logging_encryption_algorithm"></a> [logging\_encryption\_algorithm](#input\_logging\_encryption\_algorithm) | The encryption algorithm used for S3 logging. Valid values: 'AES256', 'aws:kms'. | `string` | `"AES256"` | no |
 | <a name="input_logging_encryption_enabled"></a> [logging\_encryption\_enabled](#input\_logging\_encryption\_enabled) | Enable encryption for S3 logging. | `bool` | `true` | no |

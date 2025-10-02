@@ -39,7 +39,7 @@ output "bucket_id" {
 
 output "bucket_lifecycle_configuration" {
   description = "The bucket's lifecycle configuration"
-  value       = var.lifecycle_enabled ? aws_s3_bucket_lifecycle_configuration.this[0].rule[0] : null
+  value       = length(var.lifecycle_rules) > 0 ? aws_s3_bucket_lifecycle_configuration.this[0].rule : null
 }
 
 output "bucket_logging_target" {

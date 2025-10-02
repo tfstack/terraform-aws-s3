@@ -1,12 +1,14 @@
 # S3 Bucket with Lifecycle Configuration
 
-This Terraform module provisions an **AWS S3 bucket** with **lifecycle configuration** for automatic cleanup of incomplete multipart uploads.
+This Terraform module provisions an **AWS S3 bucket** with **flexible lifecycle configuration** supporting multiple rules for data management.
 
 ## Features
 
-- ✅ **Creates an S3 bucket** with lifecycle policies
+- ✅ **Creates an S3 bucket** with dynamic lifecycle policies
+- ✅ **Multiple lifecycle rules** support (expiration, transitions, cleanup)
 - ✅ **Automatic cleanup** of incomplete multipart uploads
-- ✅ **Configurable retention** period for cleanup
+- ✅ **Configurable retention** periods for different object types
+- ✅ **Storage class transitions** for cost optimization
 - ✅ **Versioning enabled** for data protection
 - ✅ **Server-side encryption** with AES256
 
@@ -31,10 +33,28 @@ module "s3_bucket" {
   force_destroy = true
 
   # Lifecycle Configuration
-  lifecycle_enabled = true
-  lifecycle_rule_id = "cleanup-incomplete-uploads"
-  lifecycle_rule_status = "Enabled"
-  lifecycle_abort_incomplete_multipart_upload_days = 3
+  lifecycle_rules = [
+    {
+      id     = "cleanup-incomplete-uploads"
+      status = "Enabled"
+      abort_incomplete_multipart_upload = {
+        days_after_initiation = 3
+      }
+    },
+    {
+      id     = "expire-old-logs"
+      status = "Enabled"
+      filter = {
+        prefix = "logs/"
+      }
+      expiration = {
+        days = 90
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = 30
+      }
+    }
+  ]
 
   # Additional Configuration
   enable_versioning = true

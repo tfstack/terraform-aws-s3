@@ -61,38 +61,68 @@ resource "aws_s3_bucket_versioning" "this" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
-  count = var.lifecycle_enabled ? 1 : 0
+  count = length(var.lifecycle_rules) > 0 ? 1 : 0
 
   bucket = aws_s3_bucket.this.id
 
-  rule {
-    id     = var.lifecycle_rule_id
-    status = var.lifecycle_rule_status
+  dynamic "rule" {
+    for_each = var.lifecycle_rules
+    content {
+      id     = rule.value.id
+      status = rule.value.status
 
-    filter {
-      prefix = ""
-    }
+      # Filter block
+      dynamic "filter" {
+        for_each = lookup(rule.value, "filter", null) != null ? [lookup(rule.value, "filter", {})] : []
+        content {
+          prefix = lookup(filter.value, "prefix", null)
 
-    abort_incomplete_multipart_upload {
-      days_after_initiation = var.lifecycle_abort_incomplete_multipart_upload_days
-    }
-  }
+          # AWS S3 lifecycle only supports one tag per filter
+          # If multiple tags are provided, use the first one
+          dynamic "tag" {
+            for_each = lookup(filter.value, "tag", null) != null ? [lookup(filter.value, "tag", {})] : []
+            content {
+              key   = lookup(tag.value, "key", null)
+              value = lookup(tag.value, "value", null)
+            }
+          }
+        }
+      }
 
-  # Validation to ensure lifecycle rule is properly configured
-  lifecycle {
-    precondition {
-      condition     = var.lifecycle_enabled == false || (var.lifecycle_rule_status == "Enabled" || var.lifecycle_rule_status == "Disabled")
-      error_message = "Lifecycle rule status must be 'Enabled' or 'Disabled' when lifecycle is enabled."
-    }
+      # Expiration block
+      dynamic "expiration" {
+        for_each = lookup(rule.value, "expiration", null) != null ? [lookup(rule.value, "expiration", {})] : []
+        content {
+          days = lookup(expiration.value, "days", null)
+          date = lookup(expiration.value, "date", null)
+        }
+      }
 
-    precondition {
-      condition     = var.lifecycle_enabled == false || var.lifecycle_abort_incomplete_multipart_upload_days > 0
-      error_message = "Lifecycle abort incomplete multipart upload days must be greater than 0 when lifecycle is enabled."
-    }
+      # Noncurrent version expiration block
+      dynamic "noncurrent_version_expiration" {
+        for_each = lookup(rule.value, "noncurrent_version_expiration", null) != null ? [lookup(rule.value, "noncurrent_version_expiration", {})] : []
+        content {
+          noncurrent_days = lookup(noncurrent_version_expiration.value, "noncurrent_days", null)
+        }
+      }
 
-    precondition {
-      condition     = var.lifecycle_enabled == false || (length(var.lifecycle_rule_id) > 0 && length(var.lifecycle_rule_id) <= 255)
-      error_message = "Lifecycle rule ID must be between 1 and 255 characters when lifecycle is enabled."
+      # Abort incomplete multipart upload block
+      dynamic "abort_incomplete_multipart_upload" {
+        for_each = lookup(rule.value, "abort_incomplete_multipart_upload", null) != null ? [lookup(rule.value, "abort_incomplete_multipart_upload", {})] : []
+        content {
+          days_after_initiation = lookup(abort_incomplete_multipart_upload.value, "days_after_initiation", null)
+        }
+      }
+
+      # Transitions block
+      dynamic "transition" {
+        for_each = lookup(rule.value, "transitions", null) != null ? lookup(rule.value, "transitions", []) : []
+        content {
+          days          = lookup(transition.value, "days", null)
+          date          = lookup(transition.value, "date", null)
+          storage_class = lookup(transition.value, "storage_class", null)
+        }
+      }
     }
   }
 }
