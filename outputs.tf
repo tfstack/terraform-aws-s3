@@ -20,7 +20,11 @@ output "bucket_domain_name" {
 
 output "bucket_encryption_configuration" {
   description = "The bucket's server-side encryption configuration"
-  value       = length(aws_s3_bucket.this.server_side_encryption_configuration) > 0 ? aws_s3_bucket.this.server_side_encryption_configuration : null
+  value = length(aws_s3_bucket.this.server_side_encryption_configuration) > 0 ? {
+    sse_algorithm      = aws_s3_bucket.this.server_side_encryption_configuration[0].rule[0].apply_server_side_encryption_by_default[0].sse_algorithm
+    kms_key_id         = aws_s3_bucket.this.server_side_encryption_configuration[0].rule[0].apply_server_side_encryption_by_default[0].kms_master_key_id
+    bucket_key_enabled = aws_s3_bucket.this.server_side_encryption_configuration[0].rule[0].bucket_key_enabled
+  } : null
 }
 
 output "bucket_hosted_zone_id" {
@@ -35,7 +39,7 @@ output "bucket_id" {
 
 output "bucket_lifecycle_configuration" {
   description = "The bucket's lifecycle configuration"
-  value       = length(aws_s3_bucket.this.lifecycle_rule) > 0 ? aws_s3_bucket.this.lifecycle_rule : null
+  value       = var.lifecycle_enabled ? aws_s3_bucket_lifecycle_configuration.this[0].rule[0] : null
 }
 
 output "bucket_logging_target" {
@@ -55,10 +59,10 @@ output "bucket_region" {
 
 output "bucket_replication_configuration" {
   description = "The bucket's replication configuration"
-  value       = length(aws_s3_bucket.this.replication_configuration) > 0 ? aws_s3_bucket.this.replication_configuration : null
+  value       = length(aws_s3_bucket.this.replication_configuration) > 0 ? aws_s3_bucket.this.replication_configuration[0] : null
 }
 
 output "bucket_versioning" {
   description = "The bucket's versioning configuration"
-  value       = length(aws_s3_bucket.this.versioning) > 0 ? aws_s3_bucket.this.versioning : null
+  value       = length(aws_s3_bucket.this.versioning) > 0 ? aws_s3_bucket.this.versioning[0] : null
 }

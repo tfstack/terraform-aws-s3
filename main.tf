@@ -60,6 +60,43 @@ resource "aws_s3_bucket_versioning" "this" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  count = var.lifecycle_enabled ? 1 : 0
+
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    id     = var.lifecycle_rule_id
+    status = var.lifecycle_rule_status
+
+    filter {
+      prefix = ""
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = var.lifecycle_abort_incomplete_multipart_upload_days
+    }
+  }
+
+  # Validation to ensure lifecycle rule is properly configured
+  lifecycle {
+    precondition {
+      condition     = var.lifecycle_enabled == false || (var.lifecycle_rule_status == "Enabled" || var.lifecycle_rule_status == "Disabled")
+      error_message = "Lifecycle rule status must be 'Enabled' or 'Disabled' when lifecycle is enabled."
+    }
+
+    precondition {
+      condition     = var.lifecycle_enabled == false || var.lifecycle_abort_incomplete_multipart_upload_days > 0
+      error_message = "Lifecycle abort incomplete multipart upload days must be greater than 0 when lifecycle is enabled."
+    }
+
+    precondition {
+      condition     = var.lifecycle_enabled == false || (length(var.lifecycle_rule_id) > 0 && length(var.lifecycle_rule_id) <= 255)
+      error_message = "Lifecycle rule ID must be between 1 and 255 characters when lifecycle is enabled."
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "this" {
   count = var.block_public_policy == false ? 1 : 0
 

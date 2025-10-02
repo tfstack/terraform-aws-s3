@@ -31,6 +31,9 @@ run "test_s3_bucket" {
     # Versioning
     enable_versioning = true
 
+    # Lifecycle Configuration
+    lifecycle_enabled = true
+
     # Logging Configuration
     logging_enabled                 = true
     logging_encryption_enabled      = true
@@ -100,5 +103,21 @@ run "test_s3_bucket" {
   assert {
     condition     = aws_s3_bucket_lifecycle_configuration.logging[0].rule[0].filter[0].prefix == "logs/"
     error_message = "Lifecycle rule prefix is not set to the expected value 'logs/'."
+  }
+
+  # Test main bucket lifecycle configuration
+  assert {
+    condition     = aws_s3_bucket_lifecycle_configuration.this[0].rule[0].id == "cleanup-incomplete-uploads"
+    error_message = "Main bucket lifecycle rule ID is not set to 'cleanup-incomplete-uploads'."
+  }
+
+  assert {
+    condition     = aws_s3_bucket_lifecycle_configuration.this[0].rule[0].status == "Disabled"
+    error_message = "Main bucket lifecycle rule status is not 'Disabled'."
+  }
+
+  assert {
+    condition     = aws_s3_bucket_lifecycle_configuration.this[0].rule[0].abort_incomplete_multipart_upload[0].days_after_initiation == 1
+    error_message = "Main bucket lifecycle abort incomplete multipart upload days is not set to 1."
   }
 }
