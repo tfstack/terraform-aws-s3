@@ -32,7 +32,18 @@ run "test_s3_bucket" {
     enable_versioning = true
 
     # Lifecycle Configuration
-    lifecycle_enabled = true
+    lifecycle_rules = [
+      {
+        id     = "cleanup-incomplete-uploads"
+        status = "Enabled"
+        filter = {
+          prefix = ""
+        }
+        abort_incomplete_multipart_upload = {
+          days_after_initiation = 1
+        }
+      }
+    ]
 
     # Logging Configuration
     logging_enabled                 = true
@@ -112,8 +123,8 @@ run "test_s3_bucket" {
   }
 
   assert {
-    condition     = aws_s3_bucket_lifecycle_configuration.this[0].rule[0].status == "Disabled"
-    error_message = "Main bucket lifecycle rule status is not 'Disabled'."
+    condition     = aws_s3_bucket_lifecycle_configuration.this[0].rule[0].status == "Enabled"
+    error_message = "Main bucket lifecycle rule status is not 'Enabled'."
   }
 
   assert {
