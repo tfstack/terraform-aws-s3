@@ -11,7 +11,7 @@ No requirements.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.14.1 |
 
 ## Modules
 
@@ -25,6 +25,7 @@ No modules.
 | [aws_s3_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_acl.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_lifecycle_configuration.logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
+| [aws_s3_bucket_lifecycle_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
 | [aws_s3_bucket_logging.logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
 | [aws_s3_bucket_ownership_controls.logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
 | [aws_s3_bucket_ownership_controls.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
@@ -47,6 +48,10 @@ No modules.
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable versioning for the bucket | `bool` | `true` | no |
 | <a name="input_force_destroy"></a> [force\_destroy](#input\_force\_destroy) | Whether to allow deletion of non-empty bucket | `bool` | `false` | no |
 | <a name="input_ignore_public_acls"></a> [ignore\_public\_acls](#input\_ignore\_public\_acls) | Whether to ignore public ACLs for this bucket. | `bool` | `true` | no |
+| <a name="input_lifecycle_abort_incomplete_multipart_upload_days"></a> [lifecycle\_abort\_incomplete\_multipart\_upload\_days](#input\_lifecycle\_abort\_incomplete\_multipart\_upload\_days) | Number of days after which incomplete multipart uploads are aborted. This helps reduce storage costs by cleaning up failed uploads. | `number` | `1` | no |
+| <a name="input_lifecycle_enabled"></a> [lifecycle\_enabled](#input\_lifecycle\_enabled) | Enable lifecycle configuration for the S3 bucket | `bool` | `false` | no |
+| <a name="input_lifecycle_rule_id"></a> [lifecycle\_rule\_id](#input\_lifecycle\_rule\_id) | ID for the lifecycle rule. Must be unique within the bucket. | `string` | `"cleanup-incomplete-uploads"` | no |
+| <a name="input_lifecycle_rule_status"></a> [lifecycle\_rule\_status](#input\_lifecycle\_rule\_status) | Status of the lifecycle rule. Set to 'Disabled' to temporarily disable the rule without deleting it. | `string` | `"Disabled"` | no |
 | <a name="input_logging_enabled"></a> [logging\_enabled](#input\_logging\_enabled) | Enable logging for the S3 bucket | `bool` | `false` | no |
 | <a name="input_logging_encryption_algorithm"></a> [logging\_encryption\_algorithm](#input\_logging\_encryption\_algorithm) | The encryption algorithm used for S3 logging. Valid values: 'AES256', 'aws:kms'. | `string` | `"AES256"` | no |
 | <a name="input_logging_encryption_enabled"></a> [logging\_encryption\_enabled](#input\_logging\_encryption\_enabled) | Enable encryption for S3 logging. | `bool` | `true` | no |
